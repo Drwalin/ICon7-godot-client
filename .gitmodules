@@ -1,0 +1,6 @@
+[submodule "godot-cpp"]
+	path = godot-cpp
+	url = https://github.com/godotengine/godot-cpp.git
+[submodule "ICon7"]
+	path = ICon7
+	url = https://github.com/Drwalin/ICon7
