@@ -2,10 +2,22 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/input.hpp>
 
+#include <icon7/Command.hpp>
+#include <icon7/Flags.hpp>
+#include <icon7/Host.hpp>
+
 #include "../include/icon7-godot-client/Connections.hpp"
-#include "icon7/Command.hpp"
-#include "icon7/Flags.hpp"
-#include "icon7/Host.hpp"
+#include "../include/icon7-godot-client/ByteReader.hpp"
+
+#define METHOD_NO_ARGS(CLASS, NAME) \
+	godot::ClassDB::bind_method( \
+		godot::D_METHOD(#NAME), \
+		&CLASS::NAME);
+
+#define METHOD_ARGS(CLASS, NAME, ...) \
+	godot::ClassDB::bind_method( \
+		godot::D_METHOD(#NAME, __VA_ARGS__), \
+		&CLASS::NAME);
 
 void RpcFlags::_bind_methods()
 {
@@ -17,15 +29,9 @@ void RpcFlags::_bind_methods()
 
 void RpcHost::_bind_methods()
 {
-	godot::ClassDB::bind_method(
-		godot::D_METHOD("RegisterMethod", "funcName", "callback"),
-		&RpcHost::RegisterMethod);
-	godot::ClassDB::bind_method(
-		godot::D_METHOD("Connect", "address", "port", "onConnected"),
-		&RpcHost::Connect);
-	godot::ClassDB::bind_method(
-		godot::D_METHOD("Listen", "port", "onListen"),
-		&RpcHost::Listen);
+	METHOD_ARGS(RpcHost, RegisterMethod, "funcName", "callback");
+	METHOD_ARGS(RpcHost, Connect, "address", "port", "onConnected");
+	METHOD_ARGS(RpcHost, Listen, "port", "onListen");
 }
 
 void RpcHost::RegisterMethod(const godot::String &funcName,
@@ -34,16 +40,12 @@ void RpcHost::RegisterMethod(const godot::String &funcName,
 	std::function<void(icon7::Peer *, icon7::ByteReader *, icon7::Flags)> func =
 		[callback](icon7::Peer *peer, icon7::ByteReader *_bytes,
 				   icon7::Flags flags) {
-			auto &bytes = *_bytes;
 			RpcClient *rpcClient = (RpcClient *)(peer->userPointer);
-			godot::PackedByteArray arr;
-			arr.resize(bytes.get_remaining_bytes());
-			memcpy(arr.ptrw(), bytes.data() + bytes.get_offset(),
-				   bytes.get_remaining_bytes());
-
+			GodotByteReader *reader = memnew(GodotByteReader());
+			reader->byteReader = _bytes;
 			int64_t _flags = flags;
-
-			callback.call(rpcClient, arr, _flags);
+			callback.call(rpcClient, _flags, reader);
+			reader->unreference();
 		};
 	rpc.RegisterMessage(funcName.utf8().ptr(), func, &executionQueue);
 }
@@ -132,17 +134,12 @@ void RpcHost::_exit_tree()
 
 void RpcClient::_bind_methods()
 {
-	godot::ClassDB::bind_method(godot::D_METHOD("Disconnect"),
-								&RpcClient::Disconnect);
-	godot::ClassDB::bind_method(
-		godot::D_METHOD("Send", "functionName", "flags", "data"),
-		&RpcClient::Send);
-	godot::ClassDB::bind_method(godot::D_METHOD("IsReadyToUse"),
-								&RpcClient::IsReadyToUse);
-	godot::ClassDB::bind_method(godot::D_METHOD("IsDisconnecting"),
-								&RpcClient::IsDisconnecting);
-	godot::ClassDB::bind_method(godot::D_METHOD("IsClosed"),
-								&RpcClient::IsClosed);
+	METHOD_NO_ARGS(RpcClient, Disconnect);
+	METHOD_ARGS(RpcClient, Send, "functionName", "flags", "data");
+	METHOD_ARGS(RpcClient, SendPrepared, "flags", "writer");
+	METHOD_NO_ARGS(RpcClient, IsReadyToUse);
+	METHOD_NO_ARGS(RpcClient, IsDisconnecting);
+	METHOD_NO_ARGS(RpcClient, IsClosed);
 }
 
 void RpcClient::Disconnect()
@@ -163,6 +160,18 @@ void RpcClient::Send(const godot::String &funcName, uint64_t flags,
 	memcpy(buf.data(), fns.ptr(), fns.size());
 	memcpy(buf.data() + fns.size(), data.ptr(), data.size());
 	peer->Send(std::move(buf), icon7::Flags(flags) | icon7::FLAGS_CALL_NO_FEEDBACK);
+}
+
+void RpcClient::SendPrepared(uint64_t flags, GodotByteWriter *writer)
+{
+	writer->byteWriter.~ByteWriter();
+	
+	std::vector<uint8_t> buf;
+	std::swap(buf, writer->data);
+	
+	peer->Send(std::move(buf), flags | icon7::FLAGS_CALL_NO_FEEDBACK);
+	
+	new (&(writer->byteWriter)) bitscpp::ByteWriter(writer->data);
 }
 
 GDExtensionBool RpcClient::IsReadyToUse() const

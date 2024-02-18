@@ -8,6 +8,8 @@
 #include "../include/icon7-godot-client/gdextension_registration.h"
 
 #include "../include/icon7-godot-client/Connections.hpp"
+#include "../include/icon7-godot-client/ByteReader.hpp"
+#include "../include/icon7-godot-client/ByteWriter.hpp"
 
 void register_gameplay_types(godot::ModuleInitializationLevel p_level)
 {
@@ -16,6 +18,8 @@ void register_gameplay_types(godot::ModuleInitializationLevel p_level)
 		return;
 	}
 
+	godot::ClassDB::register_class<GodotByteReader>();
+	godot::ClassDB::register_class<GodotByteWriter>();
 	godot::ClassDB::register_class<RpcFlags>();
 	godot::ClassDB::register_class<RpcClient>();
 	godot::ClassDB::register_class<RpcHost>();

@@ -18,6 +18,9 @@
 #include <icon7/PeerUStcp.hpp>
 #include <icon7/HostUStcp.hpp>
 
+#include "ByteReader.hpp"
+#include "ByteWriter.hpp"
+
 class RpcFlags : public godot::Object
 {
 	GDCLASS(RpcFlags, Object)
@@ -67,6 +70,7 @@ public:
 
 	void Send(const godot::String &funcName, uint64_t flags,
 			  const godot::PackedByteArray &data);
+	void SendPrepared(uint64_t flags, GodotByteWriter *writer);
 	// call with return is not implemented
 	void Call(const godot::String &funcName, uint64_t flags,
 			  const godot::PackedByteArray &data, const godot::Callable &onConnect,
