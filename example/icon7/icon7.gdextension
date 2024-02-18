@@ -1,0 +1,13 @@
+[configuration]
+entry_symbol = "icon7_library_init"
+compatibility_minimum = "4.2.1"
+
+[libraries]
+linux.debug.x86_64 = "res://bin/libicon7_godot_client.so"
+linux.release.x86_64 = "res://bin/libicon7_godot_client.so"
+linux.x86_64.debug = "res://bin/libicon7_godot_client.so"
+linux.x86_64.release = "res://bin/libicon7_godot_client.so"
+windows.debug.x86_64 = "res://bin/libicon7_godot_client.dll"
+windows.release.x86_64 = "res://bin/libicon7_godot_client.dll"
+windows.x86_64.debug = "res://bin/libicon7_godot_client.dll"
+windows.x86_64.release = "res://bin/libicon7_godot_client.dll"

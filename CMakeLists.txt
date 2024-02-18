@@ -24,3 +24,9 @@ add_library(icon7_godot_client SHARED
 )
 target_link_libraries(icon7_godot_client PUBLIC icon7)
 target_link_libraries(icon7_godot_client PUBLIC godot::cpp)
+
+add_custom_command(TARGET icon7_godot_client POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:icon7_godot_client>
+	${PROJECT_SOURCE_DIR}/example/bin/libicon7_godot_client.so
+	COMMENT "dummy"
+)
