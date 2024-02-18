@@ -37,9 +37,9 @@ class RpcHost : public godot::Node
 public:
 	static void _bind_methods();
 
-	void RegisterMethod(
-		const godot::String &funcName, const godot::Callable &callback);
-	
+	void RegisterMethod(const godot::String &funcName,
+						const godot::Callable &callback);
+
 	void Listen(int64_t port, const godot::Callable &onListen);
 
 	void Connect(const godot::String &address, int64_t port,
@@ -73,8 +73,8 @@ public:
 	void SendPrepared(uint64_t flags, GodotByteWriter *writer);
 	// call with return is not implemented
 	void Call(const godot::String &funcName, uint64_t flags,
-			  const godot::PackedByteArray &data, const godot::Callable &onConnect,
-			  const godot::Callable &onError);
+			  const godot::PackedByteArray &data,
+			  const godot::Callable &onConnect, const godot::Callable &onError);
 
 	GDExtensionBool IsReadyToUse() const;
 	GDExtensionBool IsDisconnecting() const;

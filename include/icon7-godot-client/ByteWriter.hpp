@@ -17,9 +17,9 @@ class GodotByteWriter : public godot::RefCounted
 	GDCLASS(GodotByteWriter, Object)
 public:
 	GodotByteWriter();
-		
+
 	static void _bind_methods();
-	
+
 	GodotByteWriter *WriteInt8(int64_t v);
 	GodotByteWriter *WriteInt16(int64_t v);
 	GodotByteWriter *WriteInt32(int64_t v);
@@ -27,10 +27,10 @@ public:
 	GodotByteWriter *WriteFloat32(double_t v);
 	GodotByteWriter *WriteFloat64(double_t v);
 	GodotByteWriter *WriteString(const godot::String &v);
-	
+
 	int64_t GetBytes() const;
 	void Reserve(int64_t capacity);
-	
+
 public:
 	std::vector<uint8_t> data;
 	bitscpp::ByteWriter byteWriter;

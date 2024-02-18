@@ -9,15 +9,12 @@
 #include "../include/icon7-godot-client/Connections.hpp"
 #include "../include/icon7-godot-client/ByteReader.hpp"
 
-#define METHOD_NO_ARGS(CLASS, NAME) \
-	godot::ClassDB::bind_method( \
-		godot::D_METHOD(#NAME), \
-		&CLASS::NAME);
+#define METHOD_NO_ARGS(CLASS, NAME)                                            \
+	godot::ClassDB::bind_method(godot::D_METHOD(#NAME), &CLASS::NAME);
 
-#define METHOD_ARGS(CLASS, NAME, ...) \
-	godot::ClassDB::bind_method( \
-		godot::D_METHOD(#NAME, __VA_ARGS__), \
-		&CLASS::NAME);
+#define METHOD_ARGS(CLASS, NAME, ...)                                          \
+	godot::ClassDB::bind_method(godot::D_METHOD(#NAME, __VA_ARGS__),           \
+								&CLASS::NAME);
 
 void RpcFlags::_bind_methods()
 {
@@ -73,8 +70,6 @@ void RpcHost::Connect(const godot::String &address, int64_t port,
 			con->peer = peer->shared_from_this();
 			peer->userPointer = con;
 			con->rpcHost->connections.insert(con);
-			peer->host->GetRpcEnvironment()->Send(peer, icon7::FLAG_UNRELIABLE,
-					"sum", (uint32_t)0x10203040, (uint32_t)0x08070605);
 		}
 
 		onConnect->call(con);
@@ -118,7 +113,7 @@ void RpcHost::Listen(int64_t port, const godot::Callable &onListen)
 	com.userPointer = c;
 	com.function = [](auto, bool result, void *data) {
 		godot::Callable *c = (godot::Callable *)data;
-		c->call((GDExtensionBool)true);
+		c->call((GDExtensionBool) true);
 		delete c;
 	};
 	host->ListenOnPort(port, icon7::IPv4, std::move(com), &executionQueue);
@@ -159,18 +154,19 @@ void RpcClient::Send(const godot::String &funcName, uint64_t flags,
 	buf.resize(fns.size() + data.size());
 	memcpy(buf.data(), fns.ptr(), fns.size());
 	memcpy(buf.data() + fns.size(), data.ptr(), data.size());
-	peer->Send(std::move(buf), icon7::Flags(flags) | icon7::FLAGS_CALL_NO_FEEDBACK);
+	peer->Send(std::move(buf),
+			   icon7::Flags(flags) | icon7::FLAGS_CALL_NO_FEEDBACK);
 }
 
 void RpcClient::SendPrepared(uint64_t flags, GodotByteWriter *writer)
 {
 	writer->byteWriter.~ByteWriter();
-	
+
 	std::vector<uint8_t> buf;
 	std::swap(buf, writer->data);
-	
+
 	peer->Send(std::move(buf), flags | icon7::FLAGS_CALL_NO_FEEDBACK);
-	
+
 	new (&(writer->byteWriter)) bitscpp::ByteWriter(writer->data);
 }
 

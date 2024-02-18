@@ -1,15 +1,11 @@
 #include "../include/icon7-godot-client/ByteReader.hpp"
 
-#define METHOD_NO_ARGS(CLASS, NAME) \
-	godot::ClassDB::bind_method( \
-		godot::D_METHOD(#NAME), \
-		&CLASS::NAME);
+#define METHOD_NO_ARGS(CLASS, NAME)                                            \
+	godot::ClassDB::bind_method(godot::D_METHOD(#NAME), &CLASS::NAME);
 
-#define METHOD_ARGS(CLASS, NAME, ...) \
-	godot::ClassDB::bind_method( \
-		godot::D_METHOD(##NAME, __VA_ARGS__), \
-		&CLASS::NAME);
-	
+#define METHOD_ARGS(CLASS, NAME, ...)                                          \
+	godot::ClassDB::bind_method(godot::D_METHOD(##NAME, __VA_ARGS__),          \
+								&CLASS::NAME);
 
 void GodotByteReader::_bind_methods()
 {
@@ -20,7 +16,7 @@ void GodotByteReader::_bind_methods()
 	METHOD_NO_ARGS(GodotByteReader, GetFloat32);
 	METHOD_NO_ARGS(GodotByteReader, GetFloat64);
 	METHOD_NO_ARGS(GodotByteReader, GetString);
-	
+
 	METHOD_NO_ARGS(GodotByteReader, GetBytesLeft);
 	METHOD_NO_ARGS(GodotByteReader, GetOffset);
 	METHOD_NO_ARGS(GodotByteReader, GetTotalBytes);
@@ -72,7 +68,7 @@ godot::String GodotByteReader::GetString()
 {
 	std::string_view sv;
 	byteReader->op(sv);
-	
+
 	godot::String str;
 	str.utf8(sv.data(), sv.length());
 	return str;
@@ -83,12 +79,6 @@ int64_t GodotByteReader::GetBytesLeft()
 	return byteReader->get_remaining_bytes();
 }
 
-int64_t GodotByteReader::GetOffset()
-{
-	return byteReader->get_offset();
-}
+int64_t GodotByteReader::GetOffset() { return byteReader->get_offset(); }
 
-int64_t GodotByteReader::GetTotalBytes()
-{
-	return byteReader->_data.size();
-}
+int64_t GodotByteReader::GetTotalBytes() { return byteReader->_data.size(); }

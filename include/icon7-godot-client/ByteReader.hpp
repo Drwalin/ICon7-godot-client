@@ -17,7 +17,7 @@ class GodotByteReader : public godot::RefCounted
 	GDCLASS(GodotByteReader, Object)
 public:
 	static void _bind_methods();
-	
+
 	int64_t GetInt8();
 	int64_t GetInt16();
 	int64_t GetInt32();
@@ -25,11 +25,11 @@ public:
 	double_t GetFloat32();
 	double_t GetFloat64();
 	godot::String GetString();
-	
+
 	int64_t GetBytesLeft();
 	int64_t GetOffset();
 	int64_t GetTotalBytes();
-	
+
 public:
 	icon7::ByteReader *byteReader;
 };
