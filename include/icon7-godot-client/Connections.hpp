@@ -51,8 +51,8 @@ public:
 
 	friend class RpcClient;
 
-private:
-	std::shared_ptr<icon7::Host> host;
+public:
+	icon7::Host *host;
 	icon7::RPCEnvironment rpc;
 	icon7::CommandExecutionQueue executionQueue;
 
@@ -82,9 +82,9 @@ public:
 
 	friend class RpcHost;
 
-private:
+public:
 	std::shared_ptr<icon7::Peer> peer;
-	std::shared_ptr<icon7::Host> host;
+	icon7::Host *host;
 	icon7::RPCEnvironment *rpc;
 	RpcHost *rpcHost;
 };

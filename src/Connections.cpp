@@ -99,7 +99,7 @@ void RpcHost::_enter_tree()
 {
 	icon7::Initialize();
 
-	auto _host = std::make_shared<icon7::uS::tcp::Host>();
+	auto _host = new icon7::uS::tcp::Host();
 	_host->Init();
 	host = _host;
 	host->SetRpcEnvironment(&rpc);
@@ -123,6 +123,7 @@ void RpcHost::_exit_tree()
 {
 	host->DisconnectAllAsync();
 	host->WaitStopRunning();
+	delete host;
 	host = nullptr;
 	icon7::Deinitialize();
 }
