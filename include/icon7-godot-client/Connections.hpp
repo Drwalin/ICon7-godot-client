@@ -48,6 +48,9 @@ public:
 	void _process(double_t delta) override;
 	void _enter_tree() override;
 	void _exit_tree() override;
+	void _notification(int what);
+	
+	void _InternalDestroy();
 
 	friend class RpcClient;
 
@@ -65,6 +68,8 @@ class RpcClient : public godot::Object
 
 public:
 	static void _bind_methods();
+	
+	void _notification(int what);
 
 	void Disconnect();
 

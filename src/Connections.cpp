@@ -1,6 +1,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/input.hpp>
+#include <godot_cpp/classes/scene_tree.hpp>
 
 #include <icon7/Command.hpp>
 #include <icon7/Flags.hpp>
@@ -106,6 +107,24 @@ void RpcHost::_enter_tree()
 	host->RunAsync();
 }
 
+void RpcHost::_notification(int what)
+{
+	if (what == NOTIFICATION_WM_CLOSE_REQUEST) {
+		_InternalDestroy();
+		get_tree()->quit();
+	}
+}
+
+void RpcHost::_InternalDestroy()
+{
+	if (host) {
+		host->DisconnectAllAsync();
+		host->WaitStopRunning();
+		delete host;
+		host = nullptr;
+	}
+}
+
 void RpcHost::Listen(int64_t port, const godot::Callable &onListen)
 {
 	icon7::commands::ExecuteBooleanOnHost com;
@@ -121,11 +140,19 @@ void RpcHost::Listen(int64_t port, const godot::Callable &onListen)
 
 void RpcHost::_exit_tree()
 {
-	host->DisconnectAllAsync();
-	host->WaitStopRunning();
-	delete host;
-	host = nullptr;
+	_InternalDestroy();
 	icon7::Deinitialize();
+}
+
+void RpcClient::_notification(int what)
+{
+	if (what == godot::Node::NOTIFICATION_WM_CLOSE_REQUEST) {
+		host = nullptr;
+		rpc = nullptr;
+		rpcHost = nullptr;
+		peer->Disconnect();
+		peer = nullptr;
+	}
 }
 
 void RpcClient::_bind_methods()
