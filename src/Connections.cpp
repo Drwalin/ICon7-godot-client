@@ -83,7 +83,7 @@ void RpcHost::Connect(const godot::String &address, int64_t port,
 
 void RpcHost::_process(double_t delta)
 {
-	while (executionQueue.HasAny()) {
+	for (int j=0; j<1000 && executionQueue.HasAny(); ++j) {
 		const uint32_t MAX_EVENTS = 128;
 		icon7::Command commands[MAX_EVENTS];
 		const uint32_t dequeued =
@@ -93,6 +93,7 @@ void RpcHost::_process(double_t delta)
 			commands[i].Execute();
 			commands[i].~Command();
 		}
+		j += dequeued;
 	}
 }
 
