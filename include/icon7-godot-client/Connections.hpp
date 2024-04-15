@@ -40,7 +40,7 @@ public:
 	void RegisterMethod(const godot::String &funcName,
 						const godot::Callable &callback);
 
-	void Listen(int64_t port, const godot::Callable &onListen);
+	void Listen(const godot::String &interfaceAddress, int64_t port, const godot::Callable &onListen);
 
 	void Connect(const godot::String &address, int64_t port,
 				 const godot::Callable &onConnect);

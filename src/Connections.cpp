@@ -29,7 +29,7 @@ void RpcHost::_bind_methods()
 {
 	METHOD_ARGS(RpcHost, RegisterMethod, "funcName", "callback");
 	METHOD_ARGS(RpcHost, Connect, "address", "port", "onConnected");
-	METHOD_ARGS(RpcHost, Listen, "port", "onListen");
+	METHOD_ARGS(RpcHost, Listen, "interfaceAddress", "port", "onListen");
 }
 
 void RpcHost::RegisterMethod(const godot::String &funcName,
@@ -126,7 +126,7 @@ void RpcHost::_InternalDestroy()
 	}
 }
 
-void RpcHost::Listen(int64_t port, const godot::Callable &onListen)
+void RpcHost::Listen(const godot::String &interfaceAddress, int64_t port, const godot::Callable &onListen)
 {
 	icon7::commands::ExecuteBooleanOnHost com;
 	godot::Callable *c = new godot::Callable(onListen);
@@ -136,7 +136,7 @@ void RpcHost::Listen(int64_t port, const godot::Callable &onListen)
 		c->call((GDExtensionBool) true);
 		delete c;
 	};
-	host->ListenOnPort(port, icon7::IPv4, std::move(com), &executionQueue);
+	host->ListenOnPort(interfaceAddress.utf8().ptr(), port, icon7::IPv4, std::move(com), &executionQueue);
 }
 
 void RpcHost::_exit_tree()
