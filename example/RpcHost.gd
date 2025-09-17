@@ -21,7 +21,7 @@ func _ready()->void:
 	print("_ready");
 	RegisterMethod("sum", Sum);
 	print("_ready 0.5");
-	Listen(12345, OnListen);
+	Listen("127.0.0.1", 12345, OnListen);
 	print("_ready1");
 	Connect("127.0.0.1", 12345, self.OnConnected);
 	print("_ready2");
